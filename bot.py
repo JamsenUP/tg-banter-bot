@@ -32,21 +32,19 @@ bot_user: types.User = None
 async def cmd_start(message: types.Message):
     """Обработчик команды /start."""
     await message.reply(
-        "Здарова. Я бот для вашего чата. Добавь меня в группу, тегай или отвечай на мои сообщения — поговорим по понятиям."
+        "Здарова, я Боб. Чё надо? Добавь меня в группу, я научу вас общаться."
     )
 
 @dp.message(Command("help"))
 async def cmd_help(message: types.Message):
     """Справка по командам."""
     help_text = (
-        "📌 *Команды бота:*\n"
-        "• `/start` — Запуск и приветствие\n"
+        "📌 *Команды Боба:*\n"
+        "• `/start` — Приветствие\n"
         "• `/clear` — Очистить память диалога в этом чате\n"
-        "• `/status` — Проверить настройки и подключение модели\n"
+        "• `/status` — Проверить настройки\n"
         "• `/help` — Эта справка\n\n"
-        "💬 *Как общаться:*\n"
-        "— В личке: просто пиши любое сообщение.\n"
-        "— В группе: тегай меня (`@имя_бота`) или отвечай (Reply) на мои сообщения."
+        "💬 *Я Боб — реагирую на всё, что вы пишете в чате.*"
     )
     await message.reply(help_text, parse_mode="Markdown")
 
@@ -54,18 +52,19 @@ async def cmd_help(message: types.Message):
 async def cmd_clear(message: types.Message):
     """Очистить историю контекста в текущем чате."""
     chat_memory.clear(message.chat.id)
-    await message.reply("🧹 Память чата очищена. Начинаем с чистого листа.")
+    await message.reply("🧹 Память чата очищена. Забыли старое, погнали по новой.")
 
 @dp.message(Command("status"))
 async def cmd_status(message: types.Message):
     """Проверка текущего статуса и активной модели."""
     status_text = (
-        f"⚙️ *Статус бота:*\n"
+        f"⚙️ *Статус Боба:*\n"
+        f"• Имя: `Боб`\n"
         f"• Модель: `{config.MODEL_NAME}`\n"
         f"• LLM Сервер: `{config.LLM_BASE_URL}`\n"
         f"• Температура: `{config.TEMPERATURE}`\n"
         f"• Память чата: `{config.MAX_HISTORY_LEN}` сообщений\n"
-        f"• Случайный ответ: `{int(config.RANDOM_REPLY_CHANCE * 100)}%`"
+        f"• Отвечать на все сообщения: `{'Включено' if config.REPLY_TO_ALL else 'Только теги/ответы'}`"
     )
     await message.reply(status_text, parse_mode="Markdown")
 
@@ -102,8 +101,9 @@ async def handle_message(message: types.Message):
     # Всегда сохраняем сообщение в историю чата для поддержания контекста
     chat_memory.add_user_message(chat_id, user_name, text)
 
-    # Решаем, должен ли бот ответить
-    should_reply = is_private or is_mentioned or is_reply_to_bot or random_trigger
+    # Решаем, должен ли бот ответить:
+    # Если включен REPLY_TO_ALL - отвечает на абсолютно каждое сообщение в группе!
+    should_reply = is_private or is_mentioned or is_reply_to_bot or config.REPLY_TO_ALL or random_trigger
 
     if not should_reply:
         return
