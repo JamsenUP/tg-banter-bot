@@ -14,8 +14,8 @@ LLM_API_KEY = os.getenv("LLM_API_KEY", "ollama").strip()
 MODEL_NAME = os.getenv("MODEL_NAME", "deepseek/deepseek-chat").strip()
 
 # Параметры генерации
-TEMPERATURE = float(os.getenv("TEMPERATURE", "0.85"))
-MAX_TOKENS = int(os.getenv("MAX_TOKENS", "300"))
+TEMPERATURE = float(os.getenv("TEMPERATURE", "0.7"))
+MAX_TOKENS = int(os.getenv("MAX_TOKENS", "250"))
 
 # Настройки поведения в группе
 # Отвечать ли на абсолютно каждое сообщение в чате (по умолчанию True по запросу)
