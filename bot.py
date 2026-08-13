@@ -142,7 +142,7 @@ async def health_check(request):
     return web.Response(text="Angry Boy Telegram Bot is running OK!")
 
 async def start_dummy_server():
-    port = int(os.getenv("PORT", 8080))
+    port = int(os.getenv("PORT", "10000"))
     app = web.Application()
     app.router.add_get("/", health_check)
     app.router.add_get("/health", health_check)
@@ -150,7 +150,7 @@ async def start_dummy_server():
     await runner.setup()
     site = web.TCPSite(runner, "0.0.0.0", port)
     await site.start()
-    logger.info(f"Health-check HTTP сервер запущен на порту {port} (для Render/Web Service)")
+    logger.info(f"Health-check HTTP сервер успешно запущен на 0.0.0.0:{port}")
 
 async def main():
     global bot_user
@@ -158,12 +158,11 @@ async def main():
     logger.info(f"Бот успешно запущен: @{bot_user.username} (ID: {bot_user.id})")
     logger.info(f"Подключение к LLM: {config.LLM_BASE_URL} | Модель: {config.MODEL_NAME}")
     
-    # Запускаем dummy HTTP сервер если хостинг передает переменную PORT (например Render)
-    if os.getenv("PORT"):
-        try:
-            await start_dummy_server()
-        except Exception as e:
-            logger.warning(f"Не удалось запустить HTTP сервер health check: {e}")
+    # Всегда запускаем HTTP сервер для прохождения health check на хостингах
+    try:
+        await start_dummy_server()
+    except Exception as e:
+        logger.warning(f"Не удалось запустить HTTP сервер health check: {e}")
 
     # Удаляем вебхуки, если они были установлены, и запускаем long polling
     await bot.delete_webhook(drop_pending_updates=True)
