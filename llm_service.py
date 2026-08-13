@@ -27,7 +27,12 @@ class LLMService:
             reply = response.choices[0].message.content
             if not reply:
                 return "..."
-            return reply.strip()
+            reply = reply.strip()
+            # Убираем префиксы вроде "Бот: " или "Angry Boy: " если модель их добавила
+            for prefix in ["Бот:", "Bot:", "Angry Boy:", "AngryBoy:"]:
+                if reply.startswith(prefix):
+                    reply = reply[len(prefix):].strip()
+            return reply
         except Exception as e:
             logger.error(f"Ошибка вызова LLM API ({self.model} @ {config.LLM_BASE_URL}): {e}", exc_info=True)
             return f"⚠️ Ошибка генерации нейросети: {e}"
