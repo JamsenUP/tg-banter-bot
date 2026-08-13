@@ -68,6 +68,15 @@ async def cmd_status(message: types.Message):
     )
     await message.reply(status_text, parse_mode="Markdown")
 
+import re
+
+def is_addressed_by_name(text: str) -> bool:
+    """Проверяет, обращаются ли к боту по имени Боб."""
+    if not text:
+        return False
+    pattern = r'(?ui)\b(боб|боба|бобу|бобом|бобе|бобик|бобка|bob)\b'
+    return bool(re.search(pattern, text))
+
 @dp.message(F.text)
 async def handle_message(message: types.Message):
     """Основной обработчик текстовых сообщений."""
@@ -93,17 +102,20 @@ async def handle_message(message: types.Message):
         message.reply_to_message.from_user.id == bot_user.id
     )
 
-    # Случайный триггер в группе
+    # Проверка, обращаются ли по имени Боб
+    is_called_bob = is_addressed_by_name(text)
+
+    # Случайный триггер в группе (если настроен)
     random_trigger = False
     if not is_private and config.RANDOM_REPLY_CHANCE > 0:
         random_trigger = random.random() < config.RANDOM_REPLY_CHANCE
 
-    # Всегда сохраняем сообщение в историю чата для поддержания контекста
+    # Всегда сохраняем сообщение в историю чата для поддержания контекста диалога
     chat_memory.add_user_message(chat_id, user_name, text)
 
     # Решаем, должен ли бот ответить:
-    # Если включен REPLY_TO_ALL - отвечает на абсолютно каждое сообщение в группе!
-    should_reply = is_private or is_mentioned or is_reply_to_bot or config.REPLY_TO_ALL or random_trigger
+    # Отвечает если: в личке, ответили на его сообщение (Reply), тегнули (@username), назвали по имени Боб, или включен REPLY_TO_ALL
+    should_reply = is_private or is_mentioned or is_reply_to_bot or is_called_bob or config.REPLY_TO_ALL or random_trigger
 
     if not should_reply:
         return

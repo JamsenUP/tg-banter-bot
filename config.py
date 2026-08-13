@@ -18,10 +18,10 @@ TEMPERATURE = float(os.getenv("TEMPERATURE", "0.7"))
 MAX_TOKENS = int(os.getenv("MAX_TOKENS", "250"))
 
 # Настройки поведения в группе
-# Отвечать ли на абсолютно каждое сообщение в чате (по умолчанию True по запросу)
-REPLY_TO_ALL = os.getenv("REPLY_TO_ALL", "true").lower() in ("true", "1", "yes")
+# Отвечать только по имени Боб, тегам и реплаям (по умолчанию False)
+REPLY_TO_ALL = os.getenv("REPLY_TO_ALL", "false").lower() in ("true", "1", "yes")
 
-# Шанс случайного ответа на любое сообщение в группе (если REPLY_TO_ALL=False)
+# Шанс случайного ответа на любое сообщение в группе (если 0, только при обращении)
 RANDOM_REPLY_CHANCE = float(os.getenv("RANDOM_REPLY_CHANCE", "0.0"))
 
 # Количество сообщений истории, сохраняемых для каждого чата (память контекста)

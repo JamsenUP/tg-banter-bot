@@ -14,13 +14,13 @@ services:
       - key: MODEL_NAME
         value: deepseek/deepseek-chat
       - key: TEMPERATURE
-        value: "0.85"
+        value: "0.7"
       - key: MAX_TOKENS
         value: "250"
       - key: MAX_HISTORY_LEN
         value: "12"
       - key: REPLY_TO_ALL
-        value: "true"
+        value: "false"
       - key: RANDOM_REPLY_CHANCE
         value: "0.0"
       - key: SYSTEM_PROMPT
